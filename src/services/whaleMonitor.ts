@@ -1,60 +1,52 @@
+// 📁 src/services/whaleMonitor.ts
+
 import { client } from "../utils/client";
-import { tokenMap, quoteTokenAddresses } from "../utils/tokenList";
+import { tokenMap } from "../utils/tokenList";
 import { formatAlertMessage } from "../utils/formatter";
 import { sendAlert } from "../bot/bot";
 import { decodeEventLog, parseAbi } from "viem";
 import { getAlertKey, hasBeenAlerted, markAsAlerted } from "../utils/cache";
+import { analyzeSwap, TransferLog } from "./analyzeSwap";
 
 const transferAbi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
 ]);
 
 const TRANSFER_TOPIC =
-  "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"; // keccak256(Transfer)
+  "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 
-const THRESHOLD_TOKEN = process.env.THRESHOLD_TOKEN!;
-
-function detectTradeDirection({
-  token,
-  quote,
-  user,
-}: {
-  token: { from: string; to: string };
-  quote: { from: string; to: string };
-  user: string;
-}): "BUY" | "SELL" | "TRANSFER" {
-  const userAddr = user.toLowerCase();
-
-  const tokenFrom = token.from.toLowerCase();
-  const tokenTo = token.to.toLowerCase();
-  const quoteFrom = quote.from.toLowerCase();
-  const quoteTo = quote.to.toLowerCase();
-
-  // 🟢 BUY = user nhận token, đã gửi quote (C98/WVIC)
-  if (tokenTo === userAddr && quoteFrom === userAddr) return "BUY";
-
-  // 🔴 SELL = user gửi token, nhận quote
-  if (tokenFrom === userAddr && quoteTo === userAddr) return "SELL";
-
-  return "TRANSFER";
-}
+const THRESHOLD_TOKEN = Number(process.env.THRESHOLD_TOKEN!) || 10000;
 
 export const startWhaleMonitor = async () => {
   client.watchBlocks({
     onBlock: async (block) => {
       const fullBlock = await client.getBlock({ blockHash: block.hash });
+
       for (const txHash of fullBlock.transactions) {
+        let receipt;
+
         try {
-          const receipt = await client.getTransactionReceipt({ hash: txHash });
+          receipt = await client.getTransactionReceipt({ hash: txHash });
+        } catch (err) {
+          if (
+            err instanceof Error &&
+            err.message.includes("Transaction receipt with hash")
+          ) {
+            console.warn(`⚠️ Receipt not found yet for tx: ${txHash}`);
+            continue;
+          }
+
+          console.error(
+            `❌ Unexpected error getting receipt for tx: ${txHash}`,
+            err
+          );
+          continue;
+        }
+
+        try {
           const userAddress = receipt.from.toLowerCase();
 
-          const tokenTransfers: {
-            symbol: string;
-            from: string;
-            to: string;
-            value: number;
-            address: string;
-          }[] = [];
+          const transferLogs: TransferLog[] = [];
 
           for (const log of receipt.logs) {
             const token = tokenMap[log.address.toLowerCase()];
@@ -75,56 +67,46 @@ export const startWhaleMonitor = async () => {
                 value: bigint;
               };
 
-              tokenTransfers.push({
+              transferLogs.push({
+                tokenAddress: log.address,
                 symbol: token.symbol,
                 from,
                 to,
                 value: Number(value) / 10 ** token.decimals,
-                address: log.address.toLowerCase(),
               });
             } catch {}
           }
 
-          const quoteTransfers = tokenTransfers.filter((t) =>
-            quoteTokenAddresses.includes(t.address)
+          if (transferLogs.length === 0) continue;
+
+          const actions = analyzeSwap(
+            transferLogs,
+            userAddress,
+            THRESHOLD_TOKEN
           );
-          const otherTokenTransfers = tokenTransfers.filter(
-            (t) => !quoteTokenAddresses.includes(t.address)
-          );
 
-          if (quoteTransfers.length === 0 || otherTokenTransfers.length === 0)
-            continue;
+          for (const action of actions) {
+            const message = await formatAlertMessage({
+              amount: action.amountToken.toLocaleString(),
+              symbol: action.tokenSymbol,
+              valueAmount: `${action.amountQuote.toLocaleString()} ${
+                action.quoteSymbol
+              }`,
+              sender: action.from,
+              receiver: action.to,
+              txHash,
+              direction: action.direction,
+            });
 
-          for (const tokenTx of otherTokenTransfers) {
-            for (const quoteTx of quoteTransfers) {
-              const amountInQuote = quoteTx.value;
-              if (amountInQuote < Number(THRESHOLD_TOKEN)) continue;
+            const key = getAlertKey(
+              txHash,
+              action.tokenSymbol,
+              action.direction
+            );
+            if (hasBeenAlerted(key)) continue;
 
-              const direction = detectTradeDirection({
-                token: tokenTx,
-                quote: quoteTx,
-                user: userAddress,
-              });
-              if (direction === "TRANSFER") continue;
-
-              const message = await formatAlertMessage({
-                amount: tokenTx.value.toLocaleString(),
-                symbol: tokenTx.symbol,
-                valueAmount: `${amountInQuote.toLocaleString()} ${
-                  quoteTx.symbol
-                }`,
-                sender: tokenTx.from,
-                receiver: tokenTx.to,
-                txHash,
-                direction,
-              });
-
-              const key = getAlertKey(txHash, tokenTx.symbol, direction);
-              if (hasBeenAlerted(key)) continue;
-
-              await sendAlert(message);
-              markAsAlerted(key);
-            }
+            await sendAlert(message);
+            markAsAlerted(key);
           }
         } catch (err) {
           console.error("❌ TX parse error:", txHash, err);
