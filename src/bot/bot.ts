@@ -1,29 +1,27 @@
 import TelegramBot from "node-telegram-bot-api";
 import dotenv from "dotenv";
+import { getAllChatTargets } from "../utils/chatStore";
 dotenv.config();
 
 const token = process.env.TELEGRAM_BOT_TOKEN!;
-const chatId = process.env.CHAT_ID!;
-const threadId = process.env.THREAD_ID!;
 
 export const bot = new TelegramBot(token, { polling: false });
 
-bot.on("message", (msg) => {
-  console.log("🔥 Chat Info:", {
-    id: msg.chat.id,
-    title: msg.chat.title,
-    type: msg.chat.type,
-  });
-});
-
 export const sendAlert = async (message: string) => {
-  try {
-    await bot.sendMessage(chatId, message, {
-      parse_mode: "HTML",
-      disable_web_page_preview: true,
-      // message_thread_id: Number(threadId),
-    });
-  } catch (err) {
-    console.error("❌ Send alert error:", err);
+  const chatTargets = getAllChatTargets();
+  console.log("chatTargets", chatTargets);
+
+  for (const target of chatTargets) {
+    const { chatId, threadId } = target;
+
+    try {
+      await bot.sendMessage(chatId, message, {
+        parse_mode: "HTML",
+        disable_web_page_preview: true,
+        ...(threadId && threadId > 0 ? { message_thread_id: threadId } : {}),
+      });
+    } catch (err) {
+      console.error(`❌ Failed to send alert to ${chatId}`, err);
+    }
   }
 };

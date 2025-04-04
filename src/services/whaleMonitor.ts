@@ -43,7 +43,6 @@ export const startWhaleMonitor = async () => {
   client.watchBlocks({
     onBlock: async (block) => {
       const fullBlock = await client.getBlock({ blockHash: block.hash });
-
       for (const txHash of fullBlock.transactions) {
         try {
           const receipt = await client.getTransactionReceipt({ hash: txHash });
@@ -107,9 +106,11 @@ export const startWhaleMonitor = async () => {
                 user: userAddress,
               });
 
+              console.log("direction", direction);
+
               if (direction === "TRANSFER") continue;
 
-              const message = formatAlertMessage({
+              const message = await formatAlertMessage({
                 amount: tokenTx.value.toLocaleString(),
                 symbol: tokenTx.symbol,
                 valueAmount: `${amountInQuote.toLocaleString()} ${

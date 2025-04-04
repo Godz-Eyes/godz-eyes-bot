@@ -1,4 +1,7 @@
-export const formatAlertMessage = ({
+import { OneID } from "@oneid-xyz/inspect";
+import { formatAddress } from "./formatAddress";
+
+export const formatAlertMessage = async ({
   amount,
   symbol,
   valueAmount,
@@ -17,6 +20,9 @@ export const formatAlertMessage = ({
 }) => {
   const emoji = direction === "BUY" ? "🟢" : direction === "SELL" ? "🔴" : "🔁";
 
+  const senderLabel = await formatAddress(sender);
+  const receiverLabel = await formatAddress(receiver);
+
   return `
   🚨 <b>BIG TRADE ALERT</b> 🐳
   
@@ -24,8 +30,8 @@ export const formatAlertMessage = ({
   💰 <b>Amount:</b> ${amount} ${symbol}
   💱 <b>Value:</b> ${valueAmount}
   
-  👤 <b>From:</b> <code>${sender}</code>
-  🏦 <b>To:</b> <code>${receiver}</code>
+  👤 <b>From:</b> <code>${senderLabel}</code>
+  🏦 <b>To:</b> <code>${receiverLabel}</code>
   
   🔗 <a href="https://vicscan.xyz/tx/${txHash}">View TX</a>
   ━━━━━━━━━━━━━━━━━━
