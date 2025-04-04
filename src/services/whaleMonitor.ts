@@ -1,5 +1,5 @@
 import { client } from "../utils/client";
-import { tokenMap, tokenC98, quoteTokenAddresses } from "../utils/tokenList";
+import { tokenMap, quoteTokenAddresses } from "../utils/tokenList";
 import { formatAlertMessage } from "../utils/formatter";
 import { sendAlert } from "../bot/bot";
 import { decodeEventLog, parseAbi } from "viem";
@@ -92,7 +92,7 @@ export const startWhaleMonitor = async () => {
                 const message = formatAlertMessage({
                   amount: tokenTx.value.toLocaleString(),
                   symbol: tokenTx.symbol,
-                  c98Amount: `${amountInQuote.toLocaleString()} ${
+                  valueAmount: `${amountInQuote.toLocaleString()} ${
                     quoteTx.symbol
                   }`,
                   sender: tokenTx.from,

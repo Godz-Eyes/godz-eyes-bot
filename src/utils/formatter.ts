@@ -1,7 +1,7 @@
 export const formatAlertMessage = ({
   amount,
   symbol,
-  c98Amount,
+  valueAmount,
   sender,
   receiver,
   txHash,
@@ -9,7 +9,7 @@ export const formatAlertMessage = ({
 }: {
   amount: string;
   symbol: string;
-  c98Amount: string;
+  valueAmount: string;
   sender: string;
   receiver: string;
   txHash: string;
@@ -22,7 +22,7 @@ export const formatAlertMessage = ({
   
   🛒 <b>Action:</b> ${direction} ${emoji}
   💰 <b>Amount:</b> ${amount} ${symbol}
-  💱 <b>Value:</b> ${c98Amount} C98
+  💱 <b>Value:</b> ${valueAmount}
   
   👤 <b>From:</b> <code>${sender}</code>
   🏦 <b>To:</b> <code>${receiver}</code>
