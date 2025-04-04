@@ -3,7 +3,7 @@ import { tokenMap, tokenC98, quoteTokenAddresses } from "../utils/tokenList";
 import { formatAlertMessage } from "../utils/formatter";
 import { sendAlert } from "../bot/bot";
 import { decodeEventLog, parseAbi } from "viem";
-import { hasBeenAlerted, markAsAlerted } from "../utils/cache";
+import { getAlertKey, hasBeenAlerted, markAsAlerted } from "../utils/cache";
 
 const transferAbi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
@@ -100,9 +100,11 @@ export const startWhaleMonitor = async () => {
                   txHash,
                   direction: action as "BUY" | "SELL" | "TRANSFER",
                 });
+                const key = getAlertKey(txHash, tokenTx.symbol, action);
+                if (hasBeenAlerted(key)) continue;
 
                 await sendAlert(message);
-                markAsAlerted(txHash);
+                markAsAlerted(key);
               }
             }
           }

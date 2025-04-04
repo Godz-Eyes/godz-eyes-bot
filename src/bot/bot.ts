@@ -20,8 +20,8 @@ export const sendAlert = async (message: string) => {
   try {
     await bot.sendMessage(chatId, message, {
       parse_mode: "HTML",
-      message_thread_id: Number(threadId),
       disable_web_page_preview: true,
+      // message_thread_id: Number(threadId),
     });
   } catch (err) {
     console.error("❌ Send alert error:", err);

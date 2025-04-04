@@ -1,2 +1,8 @@
-/node_modules
+node_modules/
 .env
+dist/
+*.log
+.DS_Store
+# Ignore all JS files except in node_modules
+*.js
+*.js.map

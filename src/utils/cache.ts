@@ -1,14 +1,22 @@
-const alertedTxs = new Set<string>();
+const alertedSet = new Set<string>();
 
-export const hasBeenAlerted = (txHash: string) => {
-  return alertedTxs.has(txHash);
+export const getAlertKey = (
+  txHash: string,
+  tokenSymbol: string,
+  direction: "BUY" | "SELL" | "TRANSFER"
+) => {
+  return `${txHash}_${tokenSymbol}_${direction}`;
 };
 
-export const markAsAlerted = (txHash: string) => {
-  alertedTxs.add(txHash);
+export const hasBeenAlerted = (key: string) => {
+  return alertedSet.has(key);
+};
 
-  // Optional: Xoá sau 10 phút để không tốn RAM
+export const markAsAlerted = (key: string) => {
+  alertedSet.add(key);
+
+  // Optional: clear sau 10 phút cho nhẹ RAM
   setTimeout(() => {
-    alertedTxs.delete(txHash);
+    alertedSet.delete(key);
   }, 10 * 60 * 1000);
 };

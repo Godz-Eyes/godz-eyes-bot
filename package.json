@@ -5,6 +5,10 @@
   "repository": "https://endadinh@github.com/endadinh/vic-whale-detector.git",
   "author": "0xendale <endadinh@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
   "dependencies": {
     "dotenv": "^16.4.7",
     "node-telegram-bot-api": "^0.66.0",
