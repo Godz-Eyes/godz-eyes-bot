@@ -1,0 +1,19 @@
+{
+  "name": "vic-whale-detector",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://endadinh@github.com/endadinh/vic-whale-detector.git",
+  "author": "0xendale <endadinh@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "node-telegram-bot-api": "^0.66.0",
+    "viem": "^2.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@types/node-telegram-bot-api": "^0.64.8",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  }
+}

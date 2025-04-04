@@ -1,0 +1,37 @@
+[
+    {
+        "address": "0x193fCbB7f9EeA67CAc0D5A94ec7ccf2141c867ec",
+        "symbol": "DADA",
+        "decimals": 18
+    },
+    {
+        "address": "0xB786D9c8120D311b948cF1e5Aa48D8fBacf477E2",
+        "symbol": "SAROS",
+        "decimals": 18
+    },
+    {
+        "address": "0x0Fd0288AAAE91eaF935e2eC14b23486f86516c8C",
+        "symbol": "C98",
+        "decimals": 18
+    },
+    {
+        "address": "0x2C664910222BE7b7e203753C59A9667cBe282828",
+        "symbol": "RABBIT",
+        "decimals": 18
+    },
+    {
+        "address": "0xA7fB873EB775408Fb0A24e3163F94f138E448089",
+        "symbol": "ETER",
+        "decimals": 18
+    },
+    {
+        "address": "0x4ade201E7A66c3C9210BAB9002522C8FdBC6d1d7",
+        "symbol": "WHEEE",
+        "decimals": 18
+    },
+    {
+        "address": "0xC054751BdBD24Ae713BA3Dc9Bd9434aBe2abc1ce",
+        "symbol": "WVIC",
+        "decimals": 18
+    }
+]
