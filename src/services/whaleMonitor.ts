@@ -105,9 +105,6 @@ export const startWhaleMonitor = async () => {
                 quote: quoteTx,
                 user: userAddress,
               });
-
-              console.log("direction", direction);
-
               if (direction === "TRANSFER") continue;
 
               const message = await formatAlertMessage({

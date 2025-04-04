@@ -9,7 +9,6 @@ export const bot = new TelegramBot(token, { polling: false });
 
 export const sendAlert = async (message: string) => {
   const chatTargets = getAllChatTargets();
-  console.log("chatTargets", chatTargets);
 
   for (const target of chatTargets) {
     const { chatId, threadId } = target;

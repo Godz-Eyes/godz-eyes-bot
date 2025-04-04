@@ -25,14 +25,10 @@ export const formatAddress = async (address: string): Promise<string> => {
     }
 
     const id = await oneId.getPrimaryName(address);
-
-    console.log("detected id  : ", id);
-
     if (id) {
       setLabelToCache(address, id);
       return `<code>${id}</code>`;
     }
-
     return `<code>${shortenAddress(address)}</code>`;
   } catch {
     return `<code>${shortenAddress(address)}</code>`;
