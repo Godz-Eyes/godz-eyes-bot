@@ -34,6 +34,6 @@ export const formatAlertMessage = async ({
   🏦 <b>To:</b> <code>${receiverLabel}</code>
   
   🔗 <a href="https://vicscan.xyz/tx/${txHash}">View TX</a>
-  ━━━━━━━━━━━━━━━━━━
+  ━━━━━━━━━━━━━━
     `.trim();
 };
