@@ -14,18 +14,41 @@ const TRANSFER_TOPIC =
 
 const THRESHOLD_TOKEN = process.env.THRESHOLD_TOKEN!;
 
+function detectTradeDirection({
+  token,
+  quote,
+  user,
+}: {
+  token: { from: string; to: string };
+  quote: { from: string; to: string };
+  user: string;
+}): "BUY" | "SELL" | "TRANSFER" {
+  const userAddr = user.toLowerCase();
+
+  const tokenFrom = token.from.toLowerCase();
+  const tokenTo = token.to.toLowerCase();
+  const quoteFrom = quote.from.toLowerCase();
+  const quoteTo = quote.to.toLowerCase();
+
+  // 🟢 BUY = user nhận token, đã gửi quote (C98/WVIC)
+  if (tokenTo === userAddr && quoteFrom === userAddr) return "BUY";
+
+  // 🔴 SELL = user gửi token, nhận quote
+  if (tokenFrom === userAddr && quoteTo === userAddr) return "SELL";
+
+  return "TRANSFER";
+}
+
 export const startWhaleMonitor = async () => {
   client.watchBlocks({
     onBlock: async (block) => {
       const fullBlock = await client.getBlock({ blockHash: block.hash });
 
       for (const txHash of fullBlock.transactions) {
-        if (hasBeenAlerted(txHash)) continue;
-
         try {
           const receipt = await client.getTransactionReceipt({ hash: txHash });
+          const userAddress = receipt.from.toLowerCase();
 
-          // Parse all logs with Transfer events from tokens in list
           const tokenTransfers: {
             symbol: string;
             from: string;
@@ -38,7 +61,6 @@ export const startWhaleMonitor = async () => {
             const token = tokenMap[log.address.toLowerCase()];
             if (!token) continue;
 
-            // 💡 Chỉ parse nếu đúng event Transfer
             if (log.topics[0] !== TRANSFER_TOPIC) continue;
 
             try {
@@ -67,7 +89,6 @@ export const startWhaleMonitor = async () => {
           const quoteTransfers = tokenTransfers.filter((t) =>
             quoteTokenAddresses.includes(t.address)
           );
-
           const otherTokenTransfers = tokenTransfers.filter(
             (t) => !quoteTokenAddresses.includes(t.address)
           );
@@ -75,37 +96,36 @@ export const startWhaleMonitor = async () => {
           if (quoteTransfers.length === 0 || otherTokenTransfers.length === 0)
             continue;
 
-          console.log("detected : ", txHash);
-
           for (const tokenTx of otherTokenTransfers) {
             for (const quoteTx of quoteTransfers) {
               const amountInQuote = quoteTx.value;
+              if (amountInQuote < Number(THRESHOLD_TOKEN)) continue;
 
-              if (amountInQuote >= Number(THRESHOLD_TOKEN)) {
-                const action =
-                  tokenTx.from === quoteTx.to
-                    ? "BUY"
-                    : tokenTx.to === quoteTx.from
-                    ? "SELL"
-                    : "TRANSFER";
+              const direction = detectTradeDirection({
+                token: tokenTx,
+                quote: quoteTx,
+                user: userAddress,
+              });
 
-                const message = formatAlertMessage({
-                  amount: tokenTx.value.toLocaleString(),
-                  symbol: tokenTx.symbol,
-                  valueAmount: `${amountInQuote.toLocaleString()} ${
-                    quoteTx.symbol
-                  }`,
-                  sender: tokenTx.from,
-                  receiver: tokenTx.to,
-                  txHash,
-                  direction: action as "BUY" | "SELL" | "TRANSFER",
-                });
-                const key = getAlertKey(txHash, tokenTx.symbol, action);
-                if (hasBeenAlerted(key)) continue;
+              if (direction === "TRANSFER") continue;
 
-                await sendAlert(message);
-                markAsAlerted(key);
-              }
+              const message = formatAlertMessage({
+                amount: tokenTx.value.toLocaleString(),
+                symbol: tokenTx.symbol,
+                valueAmount: `${amountInQuote.toLocaleString()} ${
+                  quoteTx.symbol
+                }`,
+                sender: tokenTx.from,
+                receiver: tokenTx.to,
+                txHash,
+                direction,
+              });
+
+              const key = getAlertKey(txHash, tokenTx.symbol, direction);
+              if (hasBeenAlerted(key)) continue;
+
+              await sendAlert(message);
+              markAsAlerted(key);
             }
           }
         } catch (err) {
