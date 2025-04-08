@@ -20,7 +20,13 @@ const THRESHOLD_TOKEN = Number(process.env.THRESHOLD_TOKEN!) || 10000;
 export const startWhaleMonitor = async () => {
   client.watchBlocks({
     onBlock: async (block) => {
-      const fullBlock = await client.getBlock({ blockHash: block.hash });
+      let fullBlock;
+      try {
+        fullBlock = await client.getBlock({ blockHash: block.hash });
+      } catch (err) {
+        console.warn("⚠️ Block not found yet:", block.hash);
+        return; // skip block này
+      }
 
       for (const txHash of fullBlock.transactions) {
         let receipt;
