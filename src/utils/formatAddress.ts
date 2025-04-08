@@ -15,7 +15,7 @@ export const formatAddress = async (address: string): Promise<string> => {
 
   // ✅ Nếu đã cache → dùng luôn
   const cached = getLabelFromCache(lower);
-  if (cached) return `${cached} <code>${shortenAddress(address)}</code>`;
+  if (cached) return `<code>${cached}</code>`;
 
   // 🧠 Init OneID config nếu chưa
   try {
@@ -23,7 +23,6 @@ export const formatAddress = async (address: string): Promise<string> => {
       await oneId.systemConfig.initConfig();
       initialized = true;
     }
-
     const id = await oneId.getPrimaryName(address);
     if (id) {
       setLabelToCache(address, id);
