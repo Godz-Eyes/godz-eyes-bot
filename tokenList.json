@@ -33,5 +33,10 @@
         "address": "0xC054751BdBD24Ae713BA3Dc9Bd9434aBe2abc1ce",
         "symbol": "WVIC",
         "decimals": 18
+    },
+    {
+        "address": "0x4359647fE0EF8B1eE201D5bc2bb5AB872C395F04",
+        "symbol": "ONEID",
+        "decimals": 18
     }
 ]
