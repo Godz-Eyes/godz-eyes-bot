@@ -13,11 +13,9 @@ const shortenAddress = (addr: string) =>
 export const formatAddress = async (address: string): Promise<string> => {
   const lower = address.toLowerCase();
 
-  // ✅ Nếu đã cache → dùng luôn
   const cached = getLabelFromCache(lower);
   if (cached) return `<code>${cached}</code>`;
 
-  // 🧠 Init OneID config nếu chưa
   try {
     if (!initialized) {
       await oneId.systemConfig.initConfig();
