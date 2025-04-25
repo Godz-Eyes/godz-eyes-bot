@@ -38,5 +38,10 @@
         "address": "0x4359647fE0EF8B1eE201D5bc2bb5AB872C395F04",
         "symbol": "ONEID",
         "decimals": 18
+    },
+    {
+        "address": "0xAa6F3E52cb0571b88E58A93FD1Cc0744254909D2",
+        "symbol": "DEF",
+        "decimals": 18
     }
 ]
