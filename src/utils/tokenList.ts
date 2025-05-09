@@ -18,9 +18,7 @@ for (const token of tokens) {
   tokenMap[token.address.toLowerCase()] = token;
 }
 
-export const tokenC98 = tokens.find((t) => t.symbol.toUpperCase() === "C98")!;
-
-export const quoteTokens = ["C98", "WVIC"];
+export const quoteTokens = ["C98", "WVIC", "RABBIT"];
 export const quoteTokenAddresses = Object.values(tokenMap)
   .filter((t) => quoteTokens.includes(t.symbol.toUpperCase()))
   .map((t) => t.address.toLowerCase());

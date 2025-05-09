@@ -43,5 +43,10 @@
         "address": "0xAa6F3E52cb0571b88E58A93FD1Cc0744254909D2",
         "symbol": "DEF",
         "decimals": 18
+    },
+    {
+        "address": "0xa959Fa5a859365b440367A7b0C41e1c4D3424242",
+        "symbol": "STARBASE",
+        "decimals": 18
     }
 ]
