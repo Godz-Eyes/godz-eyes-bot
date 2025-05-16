@@ -48,5 +48,10 @@
         "address": "0xa959Fa5a859365b440367A7b0C41e1c4D3424242",
         "symbol": "STARBASE",
         "decimals": 18
+    },
+    {
+        "address": "0x1f4E8d4dA48Bf094565092EaE0004b82D420304b",
+        "symbol": "VIKTO",
+        "decimals": 18
     }
 ]
