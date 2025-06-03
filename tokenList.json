@@ -53,5 +53,10 @@
         "address": "0x1f4E8d4dA48Bf094565092EaE0004b82D420304b",
         "symbol": "VIKTO",
         "decimals": 18
+    },
+    {
+        "address": "0xF9955CBc7aEF687C8A4B22806a9246f2fC428428",
+        "symbol": "CARROT",
+        "decimals": 18
     }
 ]
