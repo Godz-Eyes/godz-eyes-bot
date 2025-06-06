@@ -58,5 +58,10 @@
         "address": "0xF9955CBc7aEF687C8A4B22806a9246f2fC428428",
         "symbol": "CARROT",
         "decimals": 18
+    },
+    {
+        "address": "0x02bfEF1211740c595B3dF9304a191CD76525A14a",
+        "symbol": "HONEY", 
+        "decimals": 18
     }
 ]
