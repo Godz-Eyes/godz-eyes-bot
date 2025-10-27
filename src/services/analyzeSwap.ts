@@ -153,6 +153,33 @@ export const analyzeSwap = (
         });
       }
     }
+
+    // Swap 2 quote tokens (e.g. VIC <-> C98)
+    const quotePairs = Object.entries(tokenTotals).filter(([addr]) =>
+      isQuote(addr)
+    );
+
+    if (quotePairs.length >= 2) {
+      const fromQuote = quotePairs.find(
+        ([_, data]) => data.fromUser >= threshold
+      );
+      const toQuote = quotePairs.find(([_, data]) => data.toUser >= threshold);
+
+      if (fromQuote && toQuote) {
+        const [fromAddr, fromData] = fromQuote;
+        const [toAddr, toData] = toQuote;
+
+        actions.push({
+          direction: "BUY", // or SELL, depending on the definition (e.g., SELL VIC to get C98)
+          tokenSymbol: tokenMap[fromAddr].symbol,
+          quoteSymbol: tokenMap[toAddr].symbol,
+          amountToken: fromData.fromUser,
+          amountQuote: toData.toUser,
+          from: userAddress,
+          to: userAddress,
+        });
+      }
+    }
   }
 
   return actions;
