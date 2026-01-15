@@ -7,11 +7,17 @@ type TokenMeta = {
   decimals: number;
 };
 
-const raw = fs.readFileSync(
-  path.join(__dirname, "../../tokenList.json"),
-  "utf-8"
-);
-const tokens = JSON.parse(raw) as TokenMeta[];
+let tokens: TokenMeta[] = [];
+try {
+  const raw = fs.readFileSync(
+    path.join(__dirname, "../../tokenList.json"),
+    "utf-8"
+  );
+  tokens = JSON.parse(raw) as TokenMeta[];
+} catch (err) {
+  // Silent fallback
+  tokens = [];
+}
 
 export const tokenMap: Record<string, TokenMeta> = {};
 for (const token of tokens) {

@@ -1,5 +1,7 @@
 // 📁 src/services/whaleMonitor.ts
 
+import { logger } from "../utils/logger";
+
 import { client } from "../utils/client";
 import { tokenMap } from "../utils/tokenList";
 import { formatAlertMessage } from "../utils/formatter";
@@ -24,8 +26,11 @@ export const startWhaleMonitor = async () => {
       try {
         fullBlock = await client.getBlock({ blockHash: block.hash });
       } catch (err) {
-        return; // skip block này
+        // logger.warn("⚠️ Block not found yet:", block.hash);
+        return; // skip block
       }
+
+      if (!fullBlock || !fullBlock.transactions) return;
 
       for (const txHash of fullBlock.transactions) {
         let receipt;
@@ -33,14 +38,11 @@ export const startWhaleMonitor = async () => {
         try {
           receipt = await client.getTransactionReceipt({ hash: txHash });
         } catch (err) {
-          if (
-            err instanceof Error &&
-            err.message.includes("Transaction receipt with hash")
-          ) {
           continue;
         }
 
         try {
+          if (!receipt) continue;
           const userAddress = receipt.from.toLowerCase();
 
           const transferLogs: TransferLog[] = [];
@@ -106,11 +108,11 @@ export const startWhaleMonitor = async () => {
             markAsAlerted(key);
           }
         } catch (err) {
-
+          logger.error("❌ TX parse error:", txHash, err);
         }
       }
     },
   });
 
-
+  logger.log("🛰️ Whale monitor is running...");
 };

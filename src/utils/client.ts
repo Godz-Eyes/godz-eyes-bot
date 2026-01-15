@@ -11,7 +11,7 @@ export const client = createPublicClient({
     },
     rpcUrls: {
       default: {
-        http: ["https://rpc.viction.xyz"],
+        http: [process.env.RPC_URL || "https://rpc.viction.xyz"],
       },
     },
   },

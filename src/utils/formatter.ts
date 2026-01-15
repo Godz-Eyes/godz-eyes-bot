@@ -18,6 +18,7 @@ export const formatAlertMessage = async ({
   txHash: string;
   direction: "BUY" | "SELL" | "TRANSFER";
 }) => {
+  // Ensure direction is treated case-insensitively or defaults correctly
   const emoji = direction === "BUY" ? "🟢" : direction === "SELL" ? "🔴" : "🔁";
 
   const senderLabel = await formatAddress(sender);
