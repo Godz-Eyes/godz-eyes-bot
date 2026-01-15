@@ -20,7 +20,7 @@ export const sendAlert = async (message: string) => {
         ...(threadId && threadId > 0 ? { message_thread_id: threadId } : {}),
       });
     } catch (err) {
-      console.error(`❌ Failed to send alert to ${chatId}`, err);
+
     }
   }
 };

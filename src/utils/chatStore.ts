@@ -15,13 +15,13 @@ export const loadChatIds = () => {
     try {
       const raw = fs.readFileSync(filePath, "utf-8");
       chatTargets = JSON.parse(raw);
-      console.log(`✅ Loaded ${chatTargets.length} chat targets`);
+
     } catch (err) {
-      console.error("❌ Failed to load chatIds.json:", err);
+
       chatTargets = [];
     }
   } else {
-    console.warn("⚠️ chatIds.json not found.");
+
   }
 };
 

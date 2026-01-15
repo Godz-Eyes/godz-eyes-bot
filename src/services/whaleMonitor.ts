@@ -24,7 +24,6 @@ export const startWhaleMonitor = async () => {
       try {
         fullBlock = await client.getBlock({ blockHash: block.hash });
       } catch (err) {
-        console.warn("⚠️ Block not found yet:", block.hash);
         return; // skip block này
       }
 
@@ -38,14 +37,6 @@ export const startWhaleMonitor = async () => {
             err instanceof Error &&
             err.message.includes("Transaction receipt with hash")
           ) {
-            console.warn(`⚠️ Receipt not found yet for tx: ${txHash}`);
-            continue;
-          }
-
-          console.error(
-            `❌ Unexpected error getting receipt for tx: ${txHash}`,
-            err
-          );
           continue;
         }
 
@@ -115,11 +106,11 @@ export const startWhaleMonitor = async () => {
             markAsAlerted(key);
           }
         } catch (err) {
-          console.error("❌ TX parse error:", txHash, err);
+
         }
       }
     },
   });
 
-  console.log("🛰️ Whale monitor is running...");
+
 };
