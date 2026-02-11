@@ -116,6 +116,9 @@ const processBlock = async (blockNumber: bigint) => {
 };
 
 export const startWhaleMonitor = async () => {
+  console.log("🚀 Starting Whale Monitor...");
+  await sendAlert("🚀 Godz Eyes Bot Started! Monitoring Viction chain...");
+
   // Get initial block number to start from
   try {
     lastProcessedBlock = await client.getBlockNumber();
@@ -130,6 +133,11 @@ export const startWhaleMonitor = async () => {
 
       // If we jumped ahead, catch up
       if (currentBlock > lastProcessedBlock) {
+        // Log heartbeat every 100 blocks
+        if (currentBlock % 100n === 0n) {
+             console.log(`💓 Heartbeat: Processed up to block ${currentBlock}`);
+        }
+
         // Iterate from next expected block up to current
         for (let b = lastProcessedBlock + 1n; b <= currentBlock; b++) {
           await processBlock(b);
