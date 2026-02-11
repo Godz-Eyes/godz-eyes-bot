@@ -85,6 +85,8 @@ const processBlock = async (blockNumber: bigint) => {
         userAddress,
         THRESHOLD_TOKEN
       );
+
+      logger.log(`Found ${actions.length} whale actions in block ${blockNumber}`);
       
       for (const action of actions) {
         const message = await formatAlertMessage({
@@ -117,7 +119,6 @@ const processBlock = async (blockNumber: bigint) => {
 
 export const startWhaleMonitor = async () => {
   console.log("🚀 Starting Whale Monitor...");
-  await sendAlert("🚀 Godz Eyes Bot Started! Monitoring Viction chain...");
 
   // Get initial block number to start from
   try {
@@ -135,7 +136,7 @@ export const startWhaleMonitor = async () => {
       if (currentBlock > lastProcessedBlock) {
         // Log heartbeat every 100 blocks
         if (currentBlock % 100n === 0n) {
-             console.log(`💓 Heartbeat: Processed up to block ${currentBlock}`);
+             logger.log(`💓 Heartbeat: Processed up to block ${currentBlock}`);
         }
 
         // Iterate from next expected block up to current
