@@ -79,7 +79,7 @@ const processTransaction = async (tx: Transaction) => {
       // DEBUG: If it looks like a Transfer but we don't know the token, LOG IT.
       if (!token) {
          if (log.topics[0] === TRANSFER_TOPIC) {
-             logger.log(`❓ Ignored Transfer from Unknown Token: ${logAddress}`);
+          logger.log(`❓ Ignored Transfer from Unknown Token: ${logAddress}`);
          }
          continue;
       }
@@ -218,8 +218,6 @@ export const startWhaleMonitor = async () => {
   logger.log("🚀 Starting Optimized Whale Monitor (Configurable + Queue Mode)...");
   logger.log(`⚙️ Config: BATCH=${BATCH_SIZE}, Delay=${RPC_DELAY}, LAG_LIMIT=${MAX_BLOCK_LAG}`);
   
-  await sendAlert("🚀 Godz Eyes Bot Started! Queue Mode...");
-
   const connect = async () => {
     try {
       const currentBlock = await withTimeout(client.getBlockNumber(), 10000);
